@@ -1,30 +1,64 @@
 <script>
-	export let name;
+    import StickyContent from './StickyContent.svelte';
+
+    let stickToTop = true;
 </script>
 
-<main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
-</main>
-
 <style>
-	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-	}
+    .inputContainer {
+        display: flex;
+        align-items: baseline;
+        margin-bottom: 1rem;
+    }
 
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
+    input {
+        margin-right: 0.5rem;
+    }
 
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
+    main {
+        max-width: 65rem;
+        margin: 0 auto;
+    }
 </style>
+
+<main>
+    <h1>A position: sticky action with Svelte</h1>
+
+    <div class="inputContainer">
+        <input type="checkbox" bind:checked={stickToTop} id="top" /><label
+            for="top">Stick to top</label>
+    </div>
+
+    {#each Array(5) as _}
+        <StickyContent {stickToTop}>
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
+                ullamcorper, mi eu faucibus rutrum, quam mauris tempor eros,
+                vitae tristique est sapien sed enim. Fusce sit amet interdum
+                leo. Ut id eros convallis, tincidunt lacus commodo, sodales
+                lorem. Sed turpis odio, blandit placerat nisl a, viverra
+                scelerisque nisi. Maecenas efficitur arcu libero, eget viverra
+                leo tempus non. Praesent venenatis lobortis cursus. Sed vitae
+                est finibus, tincidunt est a, ultricies mauris. Praesent tempor
+                consequat ante nec tristique. Sed non quam convallis, ultricies
+                massa nec, tempus urna. Fusce tempor mi quis pharetra malesuada.
+                Vivamus vitae metus ipsum.
+            </p>
+            <p>
+                Phasellus lobortis molestie turpis, nec sodales tellus rhoncus
+                non. Nulla a convallis ipsum. Duis in mauris gravida purus
+                sagittis ultrices eget sit amet diam. Curabitur pharetra
+                tincidunt nibh quis venenatis. Aenean diam diam, bibendum non
+                nunc at, scelerisque accumsan libero. Aenean condimentum, ex id
+                pulvinar posuere, purus urna ullamcorper metus, at pretium purus
+                ante ut ex. Suspendisse quis pretium diam. Mauris et fringilla
+                odio. Donec nec erat et purus congue sagittis vel in eros.
+                Pellentesque pulvinar, enim et sagittis venenatis, odio risus
+                finibus mi, quis gravida dui felis at purus. Nullam semper at
+                sem ultrices eleifend. Cras tincidunt est neque, vitae porta
+                risus suscipit sit amet. Curabitur ullamcorper a lacus vel
+                scelerisque. Proin lobortis elit iaculis lacus efficitur tempor.
+            </p>
+        </StickyContent>
+    {/each}
+</main>
