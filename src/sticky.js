@@ -3,42 +3,85 @@
  * @param node  - the node the action is placed on
  * @param params.callback - function to execute when the node becomes stuck or unstuck
  */
-export default function sticky(node, params) {
-    const { callback, stickToTop } = params;
+export default function sticky(node, { callback, stickToTop }) {
     const intersectionCallback = function (entries) {
+        // only observing one item at a time
         const entry = entries[0];
 
-        let isStuck = true;
-
-        if (entry.isIntersecting) {
-            isStuck = false;
+        let isStuck = false;
+        if (!entry.isIntersecting && isValidYPosition(entry)) {
+            isStuck = true;
         }
 
-        callback(isStuck, entry);
+        callback(isStuck);
     };
 
-    const observer = new IntersectionObserver(intersectionCallback, {});
+    const isValidYPosition = function ({ target, boundingClientRect }) {
+        if (target === stickySentinelTop) {
+            return boundingClientRect.y < 0;
+        } else {
+            return boundingClientRect.y > 0;
+        }
+    };
+
+    const mutationCallback = function (mutations) {
+        // If something changes and the sentinel nodes are no longer first and last child, put them back in position
+        mutations.forEach(function (mutation) {
+            const { parentNode: topParent } = stickySentinelTop;
+            const { parentNode: bottomParent } = stickySentinelBottom;
+
+            if (stickySentinelTop !== topParent.firstChild) {
+                topParent.prepend(stickySentinelTop);
+            }
+            if (stickySentinelBottom !== bottomParent.lastChild) {
+                bottomParent.append(stickySentinelBottom);
+            }
+        });
+    };
+
+    const intersectionObserver = new IntersectionObserver(
+        intersectionCallback,
+        {}
+    );
+    const mutationObserver = new MutationObserver(mutationCallback);
 
     // we insert and observe a sentinel node immediately after the target
     // when it is visible, the target node cannot be sticking
+    // I don't love doing this, it could mess up selectors
+    // what about two position sticky nodes in same parent?
     const stickySentinelTop = document.createElement('div');
     stickySentinelTop.classList.add('stickySentinelTop');
+    node.parentNode.prepend(stickySentinelTop);
+
     const stickySentinelBottom = document.createElement('div');
     stickySentinelBottom.classList.add('stickySentinelBottom');
-    node.parentNode.prepend(stickySentinelTop);
     node.parentNode.append(stickySentinelBottom);
 
+    // what about in the middle?
     if (stickToTop) {
-        observer.observe(stickySentinelTop);
+        intersectionObserver.observe(stickySentinelTop);
     } else {
-        observer.observe(stickySentinelBottom);
+        intersectionObserver.observe(stickySentinelBottom);
     }
 
+    mutationObserver.observe(node.parentNode, { childList: true });
+
     return {
-        // TODO: paragraphs are moved around when toggled
-        update(params) {
-            console.log(params.stickToTop);
-            // unobserve and reobserve
+        update({ stickToTop }) {
+            // change which sentinel we are observing
+            if (stickToTop) {
+                intersectionObserver.unobserve(stickySentinelBottom);
+                intersectionObserver.observe(stickySentinelTop);
+            } else {
+                intersectionObserver.unobserve(stickySentinelTop);
+                intersectionObserver.observe(stickySentinelBottom);
+            }
+        },
+
+        // might not be necessary
+        // https://stackoverflow.com/questions/51106261/should-mutationobservers-be-removed-disconnected-when-the-attached-dom-node-is-r/51106262#51106262
+        destroy() {
+            intersectionObserver.disconnect();
         }
     };
 }

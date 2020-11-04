@@ -5,7 +5,7 @@
 
     let isSticking = false;
 
-    function stickyCallback(isStuck, entry) {
+    function stickyCallback(isStuck) {
         isSticking = isStuck;
     }
 </script>
