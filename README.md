@@ -4,6 +4,8 @@ This is a demo of using Svelte actions to detect a position: sticky node becomin
 
 [REPL](https://svelte.dev/repl/4ad71e00c86c47d29806e17f09ff0869?version=3)
 
+![Demo](demo.gif)
+
 ## Get started
 
 Install the dependencies...
