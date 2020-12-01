@@ -5,8 +5,8 @@
 
     let isSticking = false;
 
-    function stickyCallback(isStuck) {
-        isSticking = isStuck;
+    function handleStuck(e) {
+        isSticking = e.detail.isStuck;
     }
 </script>
 
@@ -53,7 +53,8 @@
         class="sticky"
         data-stuck={isSticking}
         data-position={stickToTop ? 'top' : 'bottom'}
-        use:sticky={{ callback: stickyCallback, stickToTop }}>
+        use:sticky={{ stickToTop }}
+        on:stuck={handleStuck}>
         I use position: sticky! (currently
         {isSticking ? 'sticking' : 'not sticking'})
     </h2>

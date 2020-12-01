@@ -1,9 +1,9 @@
 /**
- * Svelte action that executes a callback when a node becomes stuck or unstuck (position: sticky is having an effect)
+ * Svelte action that dispatches a custom stuck event when a node becomes stuck or unstuck (position: sticky is having an effect)
  * @param node  - the node the action is placed on
  * @param params.callback - function to execute when the node becomes stuck or unstuck
  */
-export default function sticky(node, { callback, stickToTop }) {
+export default function sticky(node, { stickToTop }) {
     const intersectionCallback = function (entries) {
         // only observing one item at a time
         const entry = entries[0];
@@ -13,7 +13,9 @@ export default function sticky(node, { callback, stickToTop }) {
             isStuck = true;
         }
 
-        callback(isStuck);
+        node.dispatchEvent(new CustomEvent('stuck', {
+            detail: { isStuck }
+        }));
     };
 
     const isValidYPosition = function ({ target, boundingClientRect }) {
@@ -47,8 +49,6 @@ export default function sticky(node, { callback, stickToTop }) {
 
     // we insert and observe a sentinel node immediately after the target
     // when it is visible, the target node cannot be sticking
-    // I don't love doing this, it could mess up selectors
-    // what about two position sticky nodes in same parent?
     const stickySentinelTop = document.createElement('div');
     stickySentinelTop.classList.add('stickySentinelTop');
     node.parentNode.prepend(stickySentinelTop);
@@ -57,7 +57,6 @@ export default function sticky(node, { callback, stickToTop }) {
     stickySentinelBottom.classList.add('stickySentinelBottom');
     node.parentNode.append(stickySentinelBottom);
 
-    // what about in the middle?
     if (stickToTop) {
         intersectionObserver.observe(stickySentinelTop);
     } else {
@@ -78,10 +77,9 @@ export default function sticky(node, { callback, stickToTop }) {
             }
         },
 
-        // might not be necessary
-        // https://stackoverflow.com/questions/51106261/should-mutationobservers-be-removed-disconnected-when-the-attached-dom-node-is-r/51106262#51106262
         destroy() {
             intersectionObserver.disconnect();
+            mutationObserver.disconnect();
         }
     };
 }
