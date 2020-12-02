@@ -49,12 +49,16 @@ export default function sticky(node, { stickToTop }) {
 
     // we insert and observe a sentinel node immediately after the target
     // when it is visible, the target node cannot be sticking
+    const sentinelStyle = 'position: absolute; height: 1px;';
     const stickySentinelTop = document.createElement('div');
     stickySentinelTop.classList.add('stickySentinelTop');
+    // without setting a height, Safari breaks
+    stickySentinelTop.style = sentinelStyle;
     node.parentNode.prepend(stickySentinelTop);
 
     const stickySentinelBottom = document.createElement('div');
     stickySentinelBottom.classList.add('stickySentinelBottom');
+    stickySentinelBottom.style = sentinelStyle;
     node.parentNode.append(stickySentinelBottom);
 
     if (stickToTop) {
