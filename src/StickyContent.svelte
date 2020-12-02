@@ -3,10 +3,10 @@
 
     export let stickToTop = true;
 
-    let isSticking = false;
+    let isStuck = false;
 
     function handleStuck(e) {
-        isSticking = e.detail.isStuck;
+        isStuck = e.detail.isStuck;
     }
 </script>
 
@@ -30,7 +30,7 @@
         bottom: 1rem;
     }
 
-    .sticky[data-stuck='true'] {
+    .sticky.isStuck {
         background: mintcream;
         box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.2),
             0px 0px 6px 0px rgba(0, 0, 0, 0.3);
@@ -51,12 +51,12 @@
 
     <h2
         class="sticky"
-        data-stuck={isSticking}
+        class:isStuck
         data-position={stickToTop ? 'top' : 'bottom'}
         use:sticky={{ stickToTop }}
         on:stuck={handleStuck}>
         I use position: sticky! (currently
-        {isSticking ? 'sticking' : 'not sticking'})
+        {isStuck ? 'sticking' : 'not sticking'})
     </h2>
 
     {#if stickToTop}
